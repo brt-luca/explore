@@ -1,0 +1,32 @@
+# Dipendenze
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build
+frontend/dist/
+
+# Dati grezzi (troppo grandi per git)
+data/raw/
+data/processed/
+
+# Tile generate — troppo grandi per GitHub
+# Le tile .pbf vanno su Cloudflare R2 o simile
+frontend/public/tiles/
+frontend/public/pmtiles/
+
+# Variabili d'ambiente
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.log

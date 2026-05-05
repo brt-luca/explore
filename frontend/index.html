@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Mappa Esplorativa</title>
+  <meta name="description" content="Mappa esplorativa familiare — scopri i segreti del territorio" />
+
+  <!-- MapLibre GL JS -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+
+  <!-- Stili dell'app -->
+  <link rel="stylesheet" href="/src/styles/main.css" />
+
+  <!-- Favicon placeholder -->
+  <link rel="icon" type="image/svg+xml" href="/src/icons/favicon.svg" />
+</head>
+<body>
+
+  <!-- Contenitore mappa (occupa tutto lo schermo) -->
+  <div id="map"></div>
+
+  <!-- Pulsante geolocalizzazione -->
+  <button id="btn-geolocate" class="map-btn" title="Vai alla mia posizione" aria-label="Geolocalizzazione">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+      <circle cx="12" cy="12" r="8" stroke-dasharray="4 2"/>
+    </svg>
+  </button>
+
+  <!-- Barra di ricerca -->
+  <div id="search-bar">
+    <input
+      type="search"
+      id="search-input"
+      placeholder="Cerca un luogo..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <div id="search-results" class="hidden"></div>
+  </div>
+
+  <!-- Pannello layer (comprimibile) -->
+  <div id="layer-panel" class="panel">
+    <button id="panel-toggle" class="panel-toggle" aria-label="Apri/chiudi pannello">
+      <span class="panel-toggle-icon">◀</span>
+    </button>
+    <div class="panel-content">
+      <h2 class="panel-title">Esplora</h2>
+
+      <!-- Terrain 3D -->
+      <section class="panel-section">
+        <h3>🏔️ Vista 3D</h3>
+        <label class="toggle-row">
+          <span>Terrain 3D</span>
+          <input type="checkbox" id="toggle-terrain3d" />
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="slider-row">
+          <span class="slider-label">Esagerazione</span>
+          <input type="range" id="slider-terrain3d" min="0.5" max="4" step="0.1" value="1.5" />
+        </div>
+      </section>
+
+      <!-- Rilievo -->
+      <section class="panel-section">
+        <h3>Rilievo</h3>
+        <div class="slider-row">
+          <span class="slider-label">Intensità</span>
+          <input type="range" id="slider-hillshade" min="0" max="0.8" step="0.05" value="0.45" />
+        </div>
+      </section>
+
+      <!-- Radar pioggia -->
+      <section class="panel-section">
+        <h3>🌧️ Radar pioggia</h3>
+        <label class="toggle-row">
+          <span>Visibile</span>
+          <input type="checkbox" id="toggle-rain" />
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="slider-row">
+          <span class="slider-label">Opacità</span>
+          <input type="range" id="slider-rain" min="0" max="1" step="0.05" value="0.7" />
+        </div>
+        <div class="rain-controls">
+          <button id="btn-rain-prev" class="rain-btn" title="Frame precedente">◀</button>
+          <button id="btn-rain-play" class="rain-btn rain-btn--play" title="Play/Stop animazione">▶</button>
+          <button id="btn-rain-next" class="rain-btn" title="Frame successivo">▶▶</button>
+          <span id="rain-timestamp" class="rain-timestamp">--:--</span>
+        </div>
+      </section>
+
+      <!-- Natura -->
+      <section class="panel-section">
+        <h3>🌿 Natura</h3>
+        <label class="toggle-row">
+          <span>Aree protette</span>
+          <input type="checkbox" id="toggle-protected" />
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="slider-row">
+          <span class="slider-label">Opacità</span>
+          <input type="range" id="slider-protected" min="0" max="1" step="0.05" value="1" />
+        </div>
+        <label class="toggle-row">
+          <span>🔥 Incendi attivi (24h)</span>
+          <input type="checkbox" id="toggle-firms" />
+          <span class="toggle-slider"></span>
+        </label>
+      </section>
+
+      <!-- Percorsi Waymarked -->
+      <section class="panel-section">
+        <h3>Percorsi</h3>
+        <div id="waymarked-legend"></div>
+      </section>
+
+      <!-- Curve di livello -->
+      <section class="panel-section">
+        <h3>Curve di livello</h3>
+        <div class="slider-row">
+          <span class="slider-label">Opacità</span>
+          <input type="range" id="slider-contours" min="0" max="1" step="0.05" value="0" />
+        </div>
+      </section>
+
+      <!-- Basemap legenda dinamica -->
+      <section class="panel-section">
+        <h3>Mappa</h3>
+        <div id="basemap-legend">
+          <div class="legend-loading">Caricamento...</div>
+        </div>
+      </section>
+
+      <!-- Segreti -->
+      <section class="panel-section">
+        <h3>Segreti</h3>
+        <div id="secrets-filters" class="filter-grid">
+          <!-- Popolato dinamicamente da JS -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Popup segreto (nascosto di default) -->
+  <div id="secret-popup" class="popup hidden">
+    <button class="popup-close" id="popup-close">✕</button>
+    <div id="popup-content"></div>
+  </div>
+
+  <!-- Toast notifiche -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- maplibre-contour — curve di livello vettoriali da DEM -->
+  <script src="https://unpkg.com/maplibre-contour@0.0.6/dist/index.min.js"></script>
+
+  <!-- App JS (modulo ES) -->
+  <script type="module" src="/src/main.js"></script>
+
+</body>
+</html>

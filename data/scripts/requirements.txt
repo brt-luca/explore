@@ -1,0 +1,10 @@
+# Pipeline dati — Python 3.10+
+# Installa con: pip install -r requirements.txt
+
+requests>=2.31.0        # HTTP per Overpass API e download
+tqdm>=4.66.0            # Progress bar per download lunghi
+
+# GDAL va installato separatamente a seconda dell'OS:
+# macOS:   brew install gdal && pip install GDAL==$(gdal-config --version)
+# Ubuntu:  sudo apt install gdal-bin python3-gdal
+# Windows: OSGeo4W installer (https://trac.osgeo.org/osgeo4w/)

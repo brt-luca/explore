@@ -1,0 +1,173 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 .AppleSystemUIFontMonospaced-Regular;\f1\froman\fcharset0 Times-Bold;\f2\froman\fcharset0 Times-Roman;
+}
+{\colortbl;\red255\green255\blue255;\red15\green15\blue15;\red255\green255\blue255;\red0\green0\blue0;
+}
+{\*\expandedcolortbl;;\cssrgb\c7059\c7059\c7059;\cssrgb\c100000\c100000\c100000;\cssrgb\c0\c0\c0;
+}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Mappa esplorativa personale \'96 v2.4\
+*Specifica per sviluppo (uso personale, 1 utente principale + 2/3 familiari poco tecnici)*\
+\
+0. Spirito di questo documento\
+Tutto ci\'f2 che segue \'e8 un punto di partenza, non una gabbia. Se durante lo sviluppo emerge una soluzione migliore, pi\'f9 elegante, pi\'f9 gratuita o pi\'f9 divertente di quella indicata, proponila senza remore. Gli esempi nominati sono riferimenti utili, non scelte assolute. L\'92obiettivo \'e8 fare una mappa che funzioni bene e che faccia brillare gli occhi, non vincere una gara di purezza tecnologica. Vale anche il contrario: se un\'92idea folle aggiuntiva si materializza mentre scrivi, sparala. Siamo in territorio di esplorazione, non di produzione.\
+\
+0.1 Orizzonte geografico (Europa + mondo)\
+Il cuore dell'esplorazione familiare batte in Europa, ma lo sguardo vuole poter spaziare ovunque. Quando una risorsa ha una copertura prevalentemente europea, va segnalato e, dove possibile, va proposta un'alternativa complementare per il resto del mondo. Se una risorsa \'e8 globale, tanto meglio. L\'92architettura deve permettere di cambiare sorgente layer in base all\'92area visualizzata, senza drammi. L'obiettivo \'e8 che la mappa funzioni bene sulle Dolomiti come sulle Ande, con la stessa leggerezza.\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b \cf0 \cb1 \strokec4 0.2 Metodologia di sviluppo: un passo alla volta
+\f2\b0 \
+Questo progetto \'e8 vasto per design, non per fretta. Lo sviluppo procede per fasi sequenziali: ogni fase deve funzionare bene e in modo stabile prima di passare alla successiva. Non si aggiunge nulla di nuovo finch\'e9 il passo corrente non \'e8 solido. Se durante una fase emerge un problema architetturale, si risolve l\'ec, non si copre con il layer successivo. L'obiettivo di ogni step \'e8 qualcosa di funzionante, usabile e gi\'e0 godibile \'97 non un cantiere aperto in attesa del pezzo mancante.
+\f0 \cf2 \cb3 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf2 1. Vincolo fondante\
+Tutto deve funzionare per un nucleo familiare ridotto (1\uc0\u8209 3 utilizzatori), usando esclusivamente servizi con tier gratuito cos\'ec ampio da non saturarsi nell\'92uso quotidiano. Niente abbonamenti, niente chiavi che scadono o forzano il pagamento. Eventuali API key sono opzionali e devono essere sostituibili; l\'92architettura deve reggersi anche senza.\
+\
+2. Filosofia dell\'92interfaccia\
+All\'92apertura la mappa appare pulita, chiara, senza urlare. Il terreno in rilievo si fonde con una basemap di immediata leggibilit\'e0. Le etichette possono essere spente con un gesto, o ridotte all'osso, per ottenere una tela silenziosa quando si vuole solo contemplare il paesaggio. I layer si accendono all\'92occorrenza e appaiono in una legenda dinamica (pannello comprimibile in basso a destra), spegnibili con un tocco. L\'92interfaccia riposante invita all\'92esplorazione lenta.\
+\
+3. Basemap (approccio liquido, vettoriale, modificabile)\
+Obiettivo: una basemap di partenza che sia semplice, nitida, basata su OpenStreetMap, ma che possa essere adattata a piacere. Niente stili acquerellati o eccessivamente artistici: chiarezza prima di tutto.\
+La soluzione ideale \'e8 uno **stile vettoriale personalizzato** (JSON di MapLibre) che parta da un foglio base (es. OSM Bright, OpenMapTiles Positron, o uno stile minimale autoprodotto) e permetta di:\
+- mostrare/nascondere le etichette con un interruttore (nomi localit\'e0, strade, punti di interesse)\
+- regolare la densit\'e0 delle informazioni visibili (es. solo strade principali, o anche sentieri)\
+- attivare una versione "silenziosa" (solo forme del terreno, edifici, acqua) con un solo clic\
+- avere una modalit\'e0 scura (tema notturno) derivata dallo stesso stile vettoriale, senza fonti raster aggiuntive\
+\
+Le tile vettoriali possono arrivare da:\
+- OpenFreeMap (gratuito, senza chiave, globale)\
+- PMTiles autoprodotti a partire da estrazioni OpenMapTiles, hostati staticamente su GitHub Pages\
+- altre fonti vettoriali gratuite che emergano in futuro\
+\
+Il cambio sorgente e stile deve essere un\'92opzione utente a runtime, cos\'ec da sperimentare senza paura.\
+Per i momenti in cui serve una basemap raster (es. fallback, o offline parziale), si pu\'f2 integrare una sorgente raster secondaria, ma la primaria resta vettoriale e malleabile.\
+\
+Hillshade 3D: layer separato da DEM pubblico (EU-DEM o SRTM) servito come tile raster pre-generate (hillshade) per zoom alti, e eventualmente calcolato lato client per zoom medio-bassi. L\'92obiettivo \'e8 alleggerire il client mobile senza rinunciare al sollievo tattile del terreno.\
+\
+4. Overlay ufficiali\
+Sentieri (escursionistici, ciclabili, MTB, piste da sci) \uc0\u8594  tile Waymarked Trails o layer vettoriale da OSM stilizzato localmente.\
+Ferrovie \uc0\u8594  OpenRailwayMap o, per maggiore indipendenza, layer vettoriale OSM.\
+Trasporto pubblico \uc0\u8594  \'d6PNVKarte (con fallback su layer vettoriale OSM per aree non coperte).\
+Mare \uc0\u8594  OpenSeaMap o styling vettoriale marino da OSM.\
+Confini amministrativi \uc0\u8594  layer vettoriale sottile, tratteggiato, da OSM statico.\
+Idrografia \uc0\u8594  fiumi, torrenti, canali, laghi da OSM, prelevati una tantum e serviti come GeoJSON/PMTiles vettoriale, stilizzati con delicatezza (azzurro tenue, nessun ingombro). Dona freschezza alla lettura del terreno e si sposa magnificamente con l\'92hillshade.\
+\
+5. I \'93Segreti\'94 (cuore pulsante)\
+Tutti i punti da OpenStreetMap, precaricati in un unico file GeoJSON/PMTiles.\
+Iconografia: ispirazione \'93app sportive di qualit\'e0\'94 (linee nette, silhouette, colori vivaci su tema chiaro/scuro). Per partire veloci si adotta un set open source (Maki, Temaki o simile), lo si ricolora con palette accesa (arancione attrezzeria, verde acido natura, azzurro acqua, viola urbex) e si disegnano a mano solo le icone pi\'f9 iconiche (grotte, miniere, castelli). L\'92importante \'e8 l\'92effetto finale: da app premium. Se durante lo sviluppo si trova un set pi\'f9 adatto o si decide di farne uno completamente custom, ben venga.\
+\
+Categorie:\
+\uc0\u55356 \u57306 \u65039  Rovine e ruderi\
+\uc0\u55356 \u57328  Castelli e fortezze\
+\uc0\u9935 \u65039  Miniere, cave e ingressi\
+\uc0\u55357 \u56691 \u65039  Grotte e caverne\
+\uc0\u55357 \u56487  Sorgenti e fontanelle\
+\uc0\u55357 \u56621  Punti panoramici\
+\uc0\u9968 \u65039  Vette\
+\uc0\u10013 \u65039  Croci e tabernacoli\
+\uc0\u55356 \u57139  Alberi monumentali\
+\uc0\u55357 \u57046  Rifugi e bivacchi\
+\uc0\u55357 \u57060 \u65039  Ferrovie abbandonate\
+\uc0\u55357 \u57065 \u65039  Relitti (aerei e navali)\
+\uc0\u55356 \u57325  Siti industriali dismessi\
+\uc0\u55357 \u56969  Stazioni fantasma\
+\uc0\u55356 \u57256  Opere d\'92arte pubbliche\
+\uc0\u55357 \u56382  Aree protette e riserve naturali\
+\
+Interazione: filtro rapido per tipologia, ricerca per raggio, tasto \'93Aggiungi segreto\'94 con salvataggio in localStorage ed esportazione.\
+\
+6. Live & meteo (zero chiavi)\
+Pioggia in tempo reale: animazione radar RainViewer (cache 10 min).\
+Meteo completo: Open\uc0\u8209 Meteo (vento, temperatura, umidit\'e0, copertura, previsioni 16gg) visualizzabile come isolinee e/o icone puntuali.\
+Qualit\'e0 dell\'92aria: Open\uc0\u8209 Meteo Air Quality, su attivazione manuale.\
+Fulmini storici: mappa raster della densit\'e0 media annuale (NASA LIS/OTD), pre-generata con QGIS/gdal2tiles (scala blu\uc0\u8209 viola), hostata staticamente, mostrata come overlay semitrasparente.\
+\
+7. Controlli extra\
+Ricerca localit\'e0 (Nominatim, con throttling e caching locale per non sfondare il limite di 1 req/s)\
+Geolocalizzazione GPS\
+Modalit\'e0 mobile semplificata (interfaccia ridotta automaticamente sotto una certa larghezza, pulsanti pi\'f9 grandi, niente mini\uc0\u8209 mappa n\'e9 esportazione pesante)\
+Modalit\'e0 desktop completa (mini\uc0\u8209 mappa, misurazione distanze a mano libera, esportazione ad alta risoluzione fino a 300 DPI, cambio sorgente basemap a runtime, viste personalizzate salvate in localStorage)\
+Annotazioni a pennarello salvate localmente\
+\'93Viste personalizzate\'94 (posizione, zoom, layer attivi) salvate in localStorage\
+Esportazione ad alta risoluzione (canvas MapLibre in background \uc0\u8594  PNG a 300+ DPI, solo su desktop)\
+\
+8. Organizzazione pannelli\
+Il menu di controllo \'e8 suddiviso in:\
+Basemap (stile, etichette on/off, hillshade, modo notte, sorgente tile)\
+Overlay ufficiali (sentieri, ferrovie, TP, mare, confini, idrografia)\
+Segreti (filtri, raggio, aggiunta personale)\
+Live & meteo (radar, icone meteo, isolinee, qualit\'e0 aria)\
+Extra (fulmini storici, mini\uc0\u8209 mappa, misura, annotazioni, esportazione)\
+\
+9. Idee folli gi\'e0 pronte (e in attesa di nuove)\
+Webcam pubbliche geolocalizzate (OSM, con verifica URL)\
+Previsioni marine e maree (Open\uc0\u8209 Meteo)\
+Layer Wikipedia (popup su elementi con tag wikipedia)\
+Inquinamento luminoso (VIIRS raster statico)\
+Satellite Sentinel\uc0\u8209 2 recente (WMTS Sentinel Hub, tier gratuito)\
+Layer sonoro: suoni geo\uc0\u8209 localizzati da piccolo archivio personale o Freesound (CC0), riprodotti al tocco\
+Sentieri delle api: mappa alveari OSM\
+Mappa del silenzio: elaborazione una tantum da OSM e land cover\
+\'93Dov\'92ero quel giorno?\'94: footprint orbita Sentinel\uc0\u8209 2\
+Easter egg: icona a cuore sulla casa base\
+Altre follie sono sempre benvenute: se durante lo sviluppo nasce un\'92idea stramba, va proposta. L\'92unico limite \'e8 il costo zero.\
+\
+10. Nota tecnica rapida su Python (e dintorni)\
+La domanda \'e8 lecita: Python pu\'f2 gestire quasi tutto il back\uc0\u8209 stage, ma non il frontend interattivo.\
+Quello che Python far\'e0 benissimo:\
+- Scaricare e ritagliare DEM, GeoTIFF, dati NASA\
+- Generare tile raster con QGIS (via processing o gdal2tiles), comprimere PMTiles\
+- Preparare il GeoJSON/PMTiles dei \'93Segreti\'94 partendo da estrazioni Overpass/OSM\
+- Automatizzare build e deploy su GitHub Pages (script di workflow)\
+Quello che non pu\'f2 fare da solo:\
+- Rendering interattivo della mappa nel browser \uc0\u8594  serve JavaScript con MapLibre GL JS (o Leaflet se si preferisce un raster semplice)\
+- Gestione dell\'92interfaccia, pannelli, pulsanti, salvataggio localStorage \uc0\u8594  JavaScript\
+Python e JavaScript convivranno serenamente: Python per la preparazione dei dati statici, JavaScript per l\'92applicazione web che li consuma. Se vuoi tenere il progetto in un unico linguaggio \'93mentale\'94, pensalo cos\'ec: il prodotto finale \'e8 una pagina HTML+JS che legge file statici (tile, GeoJSON, PMTiles) generati da script Python eseguiti una tantum o periodicamente.\
+\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b \cf0 \cb1 \outl0\strokewidth0 11. Fase 1 \'96 MVP (primo passo, nient'altro)
+\f2\b0 \
+L'MVP \'e8 la mappa nella sua forma minima ma gi\'e0 bella e usabile. Tutto il resto aspetta.\
+Cosa deve esserci e funzionare bene:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0
+\f1\b \cf0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Basemap vettoriale
+\f2\b0  servita da OpenFreeMap, con uno stile esistente pulito (es. Positron o Bright) modificato il minimo indispensabile per essere gradevole. Niente stile custom completo per ora: si parte da qualcosa che gi\'e0 funziona e si raffina.\
+\ls1\ilvl0
+\f1\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Hillshade
+\f2\b0  da DEM pubblico (SRTM o EU-DEM), pre-generato come tile raster e sovrapposto alla basemap con opacit\'e0 regolabile. Deve dare gi\'e0 quella sensazione tattile del terreno.\
+\ls1\ilvl0
+\f1\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Controllo etichette
+\f2\b0  on/off con un interruttore semplice (mostra/nascondi i label della basemap).\
+\ls1\ilvl0
+\f1\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+I Segreti \'96 versione base
+\f2\b0 : un sottoinsieme limitato di categorie (es. 4\'965: rovine, castelli, grotte, punti panoramici, sorgenti), estratto da OSM via Overpass per un'area geografica circoscritta (es. Italia settentrionale + Slovenia + Austria), servito come GeoJSON statico. Icone Maki ricolorate, popup essenziale con nome e categoria. Filtro per categoria attivo.\
+\ls1\ilvl0
+\f1\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Geolocalizzazione GPS
+\f2\b0  funzionante su mobile e desktop.\
+\ls1\ilvl0
+\f1\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Ricerca localit\'e0
+\f2\b0  via Nominatim con throttling minimo.\
+\ls1\ilvl0
+\f1\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Layout responsive
+\f2\b0  gi\'e0 distinto: interfaccia semplificata su mobile, pi\'f9 ricca su desktop. I pannelli di controllo esistono ma sono ridotti all'essenziale.\
+\pard\pardeftab720\sa240\partightenfactor0
+\cf0 Cosa NON fa parte dell'MVP e viene dopo:\
+Radar meteo, isolinee, qualit\'e0 dell'aria, OpenSeaMap, ferrovie, trasporto pubblico, modalit\'e0 notte, PMTiles, esportazione ad alta risoluzione, annotazioni, viste salvate, idee folli. Tutto questo esiste nel documento come orizzonte, non come richiesta immediata.\
+L'MVP \'e8 riuscito quando un familiare poco tecnico apre la pagina, vede la mappa con il rilievo, trova un castello vicino a casa e ci clicca sopra \'97 senza istruzioni.}
