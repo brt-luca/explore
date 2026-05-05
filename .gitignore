@@ -14,7 +14,6 @@ data/processed/
 
 # Tile generate — troppo grandi per GitHub
 # Le tile .pbf vanno su Cloudflare R2 o simile
-frontend/public/tiles/
 frontend/public/pmtiles/
 
 # Variabili d'ambiente
