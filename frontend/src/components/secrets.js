@@ -75,13 +75,13 @@ export async function initSecrets(map) {
 function initWithTiles(map) {
   const tileBase = window.location.hostname === 'localhost'
     ? 'http://localhost:5174'
-    : window.location.origin
+    : `${window.location.origin}/explore`
 
   map.addSource('secrets', {
     type: 'vector',
     tiles: [`${tileBase}/tiles/secrets/{z}/{x}/{y}.pbf`],
     minzoom: 4,
-    maxzoom: 14,
+    maxzoom: 12,
     attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
   })
 
