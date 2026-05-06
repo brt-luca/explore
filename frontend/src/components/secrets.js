@@ -56,26 +56,30 @@ const activeCategories = new Set(Object.keys(CATEGORIES))
 // ── Inizializzazione ──────────────────────────────────────────────────────────
 
 export async function initSecrets(map) {
-  // Controlla se esistono le tile XYZ statiche
+  // Base path diverso in locale e su GitHub Pages
+  const basePath = window.location.hostname === 'localhost'
+    ? ''
+    : '/explore'
+
   let hasTiles = false
   try {
-    const res = await fetch('/tiles/secrets/4/8/5.pbf', { method: 'HEAD' })
+    const res = await fetch(`${basePath}/tiles/secrets/4/8/5.pbf`, { method: 'HEAD' })
     hasTiles = res.ok
   } catch { hasTiles = false }
 
   if (hasTiles) {
     console.info('Segreti: usando tile XYZ statiche')
-    initWithTiles(map)
+    initWithTiles(map, basePath)
   } else {
     console.info('Segreti: usando GeoJSON demo')
     await initWithGeoJSON(map)
   }
 }
 
-function initWithTiles(map) {
+function initWithTiles(map, basePath = '') {
   const tileBase = window.location.hostname === 'localhost'
     ? 'http://localhost:5174'
-    : `${window.location.origin}/explore`
+    : window.location.origin + basePath
 
   map.addSource('secrets', {
     type: 'vector',
