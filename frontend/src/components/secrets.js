@@ -56,24 +56,8 @@ const activeCategories = new Set(Object.keys(CATEGORIES))
 // ── Inizializzazione ──────────────────────────────────────────────────────────
 
 export async function initSecrets(map) {
-  // Base path diverso in locale e su GitHub Pages
-  const basePath = window.location.hostname === 'localhost'
-    ? ''
-    : '/explore'
-
-  let hasTiles = false
-  try {
-    const res = await fetch(`${basePath}/tiles/secrets/4/8/5.pbf`, { method: 'HEAD' })
-    hasTiles = res.ok
-  } catch { hasTiles = false }
-
-  if (hasTiles) {
-    console.info('Segreti: usando tile XYZ statiche')
-    initWithTiles(map, basePath)
-  } else {
-    console.info('Segreti: usando GeoJSON demo')
-    await initWithGeoJSON(map)
-  }
+  console.info('Segreti: usando GeoJSON')
+  await initWithGeoJSON(map)
 }
 
 function initWithTiles(map, basePath = '') {
@@ -96,8 +80,9 @@ function initWithTiles(map, basePath = '') {
 
 async function initWithGeoJSON(map) {
   let geojson
+  const geojsonPath = '/geojson/secrets.geojson'
   try {
-    const res = await fetch('/geojson/secrets.geojson')
+    const res = await fetch(geojsonPath)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     geojson = await res.json()
     console.info(`Segreti caricati: ${geojson.features.length} punti`)
