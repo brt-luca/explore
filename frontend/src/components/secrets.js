@@ -80,7 +80,8 @@ function initWithTiles(map, basePath = '') {
 
 async function initWithGeoJSON(map) {
   let geojson
-  const geojsonPath = '/geojson/secrets.geojson'
+  const base = window.location.hostname === 'localhost' ? '' : '/explore'
+  const geojsonPath = `${base}/geojson/secrets.geojson`
   try {
     const res = await fetch(geojsonPath)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
