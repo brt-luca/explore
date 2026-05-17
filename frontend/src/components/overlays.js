@@ -269,3 +269,56 @@ export function setFirmsVisibility(map, visible) {
   if (!map.getLayer('firms')) return
   map.setLayoutProperty('firms', 'visibility', visible ? 'visible' : 'none')
 }
+
+// ── Strava Heatmap ───────────────────────────────────────────────────────────
+// Richiede cookie di sessione Strava valido.
+// Il cookie va inserito qui sotto — non committare su GitHub!
+// Per uso personale locale e familiare.
+
+const STRAVA_COOKIE = '_currentH=d3d3LnN0cmF2YS5jb20=; _strava4_session=da22bi574g4b5t9t1i2t61i9rlg65f4c; CookieConsent={stamp:%27F0gDVnZTs3L066FmCHTs1YLvuaJtcDl5ox1FxIBf/cF+Q1Py1ObbtQ==%27%2Cnecessary:true%2Cpreferences:false%2Cstatistics:false%2Cmarketing:false%2Cmethod:%27explicit%27%2Cver:2%2Cutc:1777322931594%2Cregion:%27it%27}; globalHeatmapAboutModal=true; xp_session_identifier=p933wgm4pia; _strava_CloudFront-Expires=1778713379000'
+
+// Colori disponibili: hot, blue, purple, gray, bluered
+const STRAVA_COLOR = 'hot'
+
+export async function initStravaHeatmap(map) {
+  // In locale usa il proxy Vite (/strava-proxy)
+  // Su GitHub Pages non funziona (richiede server) — layer nascosto
+  const isLocal = window.location.hostname === 'localhost'
+
+  map.addSource('strava-heatmap', {
+    type: 'raster',
+    tiles: isLocal
+      ? [`/strava-proxy/tiles-auth/all/${STRAVA_COLOR}/{z}/{x}/{y}.png?v=19`]
+      : ['https://placeholder.invalid/{z}/{x}/{y}.png'], // placeholder su Pages
+    tileSize: 256,
+    minzoom: 3,
+    maxzoom: 15,
+    attribution: '© <a href="https://strava.com">Strava</a>',
+  })
+
+  map.addLayer({
+    id: 'strava-heatmap',
+    type: 'raster',
+    source: 'strava-heatmap',
+    layout: { visibility: 'none' },
+    paint: {
+      'raster-opacity': 0.8,
+      'raster-resampling': 'linear',
+    },
+  })
+}
+
+export function setStravaVisibility(map, visible) {
+  if (map.getLayer('strava-heatmap')) {
+    map.setLayoutProperty('strava-heatmap', 'visibility', visible ? 'visible' : 'none')
+  }
+}
+
+export function setStravaOpacity(map, opacity) {
+  if (map.getLayer('strava-heatmap')) {
+    map.setPaintProperty('strava-heatmap', 'raster-opacity', opacity)
+  }
+}
+
+// Esporta il cookie per il tile server
+export { STRAVA_COOKIE, STRAVA_COLOR }

@@ -115,6 +115,15 @@
       <section class="panel-section">
         <h3>Percorsi</h3>
         <div id="waymarked-legend"></div>
+        <label class="toggle-row" style="margin-top:8px">
+          <span>🔥 Strava Heatmap</span>
+          <input type="checkbox" id="toggle-strava" />
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="slider-row">
+          <span class="slider-label">Opacità</span>
+          <input type="range" id="slider-strava" min="0" max="1" step="0.05" value="0.8" />
+        </div>
       </section>
 
       <!-- Curve di livello -->

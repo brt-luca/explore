@@ -5,7 +5,7 @@
  */
 
 import { setHillshadeOpacity, setLayerGroupVisibility, setOverlayVisibility, setContourOpacity, getStyleLayerIds, WAYMARKED_OVERLAYS, setTerrain3D, setTerrainExaggeration } from './map.js'
-import { setRainVisibility, setRainOpacity, playRainAnimation, stepRainFrame, setProtectedAreasVisibility, setProtectedAreasOpacity, setFirmsVisibility } from './overlays.js'
+import { setRainVisibility, setRainOpacity, playRainAnimation, stepRainFrame, setProtectedAreasVisibility, setProtectedAreasOpacity, setFirmsVisibility, setStravaVisibility, setStravaOpacity } from './overlays.js'
 
 const EXCLUDE = new Set([
   'hillshade',
@@ -15,6 +15,7 @@ const EXCLUDE = new Set([
   'contours-minor', 'contours-major', 'contours-label',
   'protected-areas-fill', 'protected-areas-names',
   'firms',
+  'strava-heatmap',
 ])
 
 // Classificazione esatta — ogni array contiene i nomi reali dei layer Liberty.
@@ -365,6 +366,14 @@ export function initPanel(map) {
   // ── Incendi NASA FIRMS ───────────────────────────────────────────────────
   document.getElementById('toggle-firms')?.addEventListener('change', (e) => {
     setFirmsVisibility(map, e.target.checked)
+  })
+
+  // ── Strava Heatmap ───────────────────────────────────────────────────────
+  document.getElementById('toggle-strava')?.addEventListener('change', (e) => {
+    setStravaVisibility(map, e.target.checked)
+  })
+  document.getElementById('slider-strava')?.addEventListener('input', (e) => {
+    setStravaOpacity(map, parseFloat(e.target.value))
   })
 
   // Costruisce la legenda dopo che tutto è caricato

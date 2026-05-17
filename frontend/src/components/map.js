@@ -116,23 +116,23 @@ function addHillshadeLayer(map) {
   // Colori e opacità vegetazione — modifica qui per personalizzare
   if (map.getLayer('landcover_wood')) {
     map.setPaintProperty('landcover_wood', 'fill-color', '#4a8c3f')
-    map.setPaintProperty('landcover_wood', 'fill-opacity', 0.35)
+    map.setPaintProperty('landcover_wood', 'fill-opacity', 0.45)
   }
   if (map.getLayer('landcover_grass')) {
     map.setPaintProperty('landcover_grass', 'fill-color', '#c8e6a0')
-    map.setPaintProperty('landcover_grass', 'fill-opacity', 0.35)
+    map.setPaintProperty('landcover_grass', 'fill-opacity', 0.4)
   }
   if (map.getLayer('park')) {
     map.setPaintProperty('park', 'fill-color', '#a8d5a2')
-    map.setPaintProperty('park', 'fill-opacity', 0.35)
+    map.setPaintProperty('park', 'fill-opacity', 0.4)
   }
   if (map.getLayer('landcover_wetland')) {
     map.setPaintProperty('landcover_wetland', 'fill-color', '#7ec8c8')
-    map.setPaintProperty('landcover_wetland', 'fill-opacity', 0.15)
+    map.setPaintProperty('landcover_wetland', 'fill-opacity', 0.35)
   }
   if (map.getLayer('landcover_sand')) {
     map.setPaintProperty('landcover_sand', 'fill-color', '#e8d5a3')
-    map.setPaintProperty('landcover_sand', 'fill-opacity', 0.15)
+    map.setPaintProperty('landcover_sand', 'fill-opacity', 0.5)
   }
   if (map.getLayer('landcover_ice')) {
     map.setPaintProperty('landcover_ice', 'fill-color', '#dff0f7')
@@ -203,10 +203,6 @@ async function addContourLayers(map) {
         levelKey: 'level',
       }),
     ],
-    // maxzoom uguale al DemSource — MapLibre usa questi tile anche a zoom superiori
-    maxzoom: 15,
-    // generateId permette il rendering anche oltre maxzoom (overzoom vettoriale)
-    generateId: true,
   })
 
   const firstSymbol = getFirstSymbolLayerId(map)
@@ -221,6 +217,7 @@ async function addContourLayers(map) {
       'source-layer': 'contours',
       filter: ['==', ['get', 'level'], 0],
       minzoom: 11,
+      maxzoom: 24,
       layout: { visibility: 'visible', 'line-join': 'round' },
       paint: {
         'line-color': '#8a7a60',
@@ -239,6 +236,7 @@ async function addContourLayers(map) {
       'source-layer': 'contours',
       filter: ['==', ['get', 'level'], 1],
       minzoom: 10,
+      maxzoom: 24,
       layout: { visibility: 'visible', 'line-join': 'round' },
       paint: {
         'line-color': '#6b5c3e',
@@ -256,11 +254,12 @@ async function addContourLayers(map) {
     'source-layer': 'contours',
     filter: ['==', ['get', 'level'], 1],
     minzoom: 12,
+    maxzoom: 24,
     layout: {
       visibility: 'visible',
       'symbol-placement': 'line',
       'text-field': ['concat', ['to-string', ['get', 'ele']], 'm'],
-      'text-font': ['Open Sans Regular'],
+      'text-font': ['Noto Sans Regular'],
       'text-size': 10,
       'text-pitch-alignment': 'auto',
     },

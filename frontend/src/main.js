@@ -11,7 +11,7 @@ import { initPanel } from './components/panel.js'
 import { initSearch } from './components/search.js'
 import { initGeolocate } from './components/geolocate.js'
 import { initSecrets } from './components/secrets.js'
-import { initRainViewer, initProtectedAreas, initProtectedAreaNames, initFirms } from './components/overlays.js'
+import { initRainViewer, initProtectedAreas, initProtectedAreaNames, initFirms, initStravaHeatmap } from './components/overlays.js'
 import { loadState, saveState } from './utils/storage.js'
 
 async function main() {
@@ -27,6 +27,7 @@ async function main() {
   await initProtectedAreas(map)
   await initProtectedAreaNames(map)
   await initFirms(map)
+  await initStravaHeatmap(map)
 
   window.__map = map
 
